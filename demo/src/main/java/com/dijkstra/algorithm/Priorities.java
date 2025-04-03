@@ -14,11 +14,11 @@ public final class Priorities {
             '*', 3, 
             '/', 3,
             '%', 3,
-            '^', 4
+            '^', 5
         );
         
         STACK_PRIORITIES = new HashMap<>(INPUT_PRIORITIES);
-        STACK_PRIORITIES.put('^', 3);
+        STACK_PRIORITIES.put('^', 4);
     }
 
     public static int getInputPriority(Character operator) {
@@ -27,9 +27,5 @@ public final class Priorities {
 
     public static int getStackPriority(Character operator) {
         return STACK_PRIORITIES.getOrDefault(operator, -1);
-    }
-    
-    public static boolean isLeftAssociative(Character operator) {
-        return operator != '^';
     }
 }

@@ -10,8 +10,4 @@ public final class Tokenizer {
     public static boolean isOperator(Character token) {
         return token != null && OPERATORS.contains(token);
     }
-
-    public static boolean isParenthesis(Character token) {
-        return token != null && (token == '(' || token == ')');
-    }
 }
