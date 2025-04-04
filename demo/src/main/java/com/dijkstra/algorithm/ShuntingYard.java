@@ -4,70 +4,97 @@ import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Scanner;
 
 public final class ShuntingYard {
-    private final Deque<Character> stack = new ArrayDeque<>();
-    private final StringBuilder output = new StringBuilder();
+    Visualizer visualizer = new Visualizer();
+    Scanner scanner = new Scanner(System.in);
+
+    private String input = new String();
+    private Deque<Character> stack = new ArrayDeque<>();
+    private StringBuilder output = new StringBuilder();
 
     public String infixToPostfix(String infix) {
-        if (infix == null || infix.trim().isEmpty()) { // checks is the string is empty
+        resetState();
+
+        if (infix == null || infix.trim().isEmpty()) {
             throw new IllegalArgumentException("Input expression cannot be null or empty");
         }
 
-        String expression = infix.replaceAll("\\s+", ""); // removes all whitespaces
+        input = infix.replaceAll("\\s+", "");
         List<Character> expressionTokens = new LinkedList<>();
 
-        for (Character c : expression.toCharArray()) {
-            expressionTokens.add(c); // inputs all the tokens into a list
+        for (Character c : input.toCharArray()) {
+            expressionTokens.add(c);
         }
 
-        for (Character inputToken : expressionTokens) { // iterates through the list of tokens
+        visualizer.setConstants(expressionTokens);
+        visualizer.print(input, stack, output.toString());
+        scanner.nextLine();
+
+        for (Character inputToken : expressionTokens) {
+
             if (!Tokenizer.isOperator(inputToken)) {
-                handleOperand(inputToken); // if the token is operand
+                handleOperand(inputToken);
             } else if (inputToken == '(') {
-                stack.push(inputToken); // if the token is '('
+                stack.push(inputToken);
             } else if (inputToken == ')') {
-                handleClosingParenthesis(); // if the token is ')'
+                handleClosingParenthesis();
             } else {
-                handleOperator(inputToken); // if the token is operator
+                handleOperator(inputToken);
             }
+
+            input = input.substring(1);
+            visualizer.print(input, stack, output.toString());
+            scanner.nextLine();
         }
 
         while (!stack.isEmpty()) {
-            output.append(stack.pop()); // empties the stack after the input line is empty
+            output.append(stack.pop());
+            visualizer.print(input, stack, output.toString());
+            scanner.nextLine();
         }
 
-        return output.toString(); // returns the output line as string
+        visualizer.printFinal(infix, output.toString());
+        return output.toString();
     }
 
     private void handleOperand(Character operand) {
-        output.append(operand); // send the operand directly to output line
+        output.append(operand);
     }
 
     private void handleClosingParenthesis() {
-        while (!stack.isEmpty() && stack.peek() != '(') { // iterates through the stack untill it is empty or untill it finds '(' in it
-            output.append(stack.pop()); // moves the operand from the stack to the output line
+        while (!stack.isEmpty() && stack.peek() != '(') {
+            output.append(stack.pop());
+            visualizer.print(input, stack, output.toString());
+            scanner.nextLine();
         }
         if (stack.isEmpty()) {
-            throw new IllegalArgumentException("Mismatched parentheses"); // throws an error if the ')' is missmatched
+            throw new IllegalArgumentException("Mismatched parentheses");
         }
-        stack.pop(); // pops the '(' after everything over it is put into the output line
+        stack.pop();
     }
 
     private void handleOperator(Character operator) {
-        while (!stack.isEmpty() && stack.peek() != '(' && hasHigherOrEqualPriority(stack.peek(), operator)) { //pops all operand in the stack with higher priority
-            output.append(stack.pop()); // moves the operand from the stack to the output line if conditions are met
+        while (!stack.isEmpty() && stack.peek() != '(' && hasHigherOrEqualPriority(stack.peek(), operator)) {
+            output.append(stack.pop());
         }
-        stack.push(operator); //pushes the next operand into the stack
+        stack.push(operator);
     }
 
     private boolean hasHigherOrEqualPriority(Character stackOp, Character inputOp) {
-        int stackPriority = Priorities.getStackPriority(stackOp); //gets the stack priority for the last operand in the stack
-        int inputPriority = Priorities.getInputPriority(inputOp); //gets the input priority for the selected operand
+        int stackPriority = Priorities.getStackPriority(stackOp);
+        int inputPriority = Priorities.getInputPriority(inputOp);
 
-        if (stackPriority == inputPriority) { //if the priorities are equal the current operand is pushed and the last operand in the stack is popped
+        if (stackPriority == inputPriority) {
             return true;
         }
-        return stackPriority > inputPriority; //if the stach operand's priority is higher the next operand is pushed into the stack
+        return stackPriority > inputPriority;
+    }
+
+    private void resetState() {
+        input = "";
+        stack.clear();
+        output.setLength(0);
     }
 }
