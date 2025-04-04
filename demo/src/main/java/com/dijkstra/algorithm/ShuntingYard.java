@@ -7,14 +7,14 @@ import java.util.List;
 import java.util.Scanner;
 
 public final class ShuntingYard {
-    Visualizer visualizer = new Visualizer();
-    Scanner scanner = new Scanner(System.in);
+    private static Visualizer visualizer = new Visualizer();
+    private static Scanner scanner = new Scanner(System.in);
 
-    private String input = new String();
-    private Deque<Character> stack = new ArrayDeque<>();
-    private StringBuilder output = new StringBuilder();
+    private static String input = new String();
+    private static Deque<Character> stack = new ArrayDeque<>();
+    private static StringBuilder output = new StringBuilder();
 
-    public String infixToPostfix(String infix) {
+    public static String infixToPostfix(String infix) {
         resetState();
 
         if (infix == null || infix.trim().isEmpty()) {
@@ -59,11 +59,11 @@ public final class ShuntingYard {
         return output.toString();
     }
 
-    private void handleOperand(Character operand) {
+    private static void handleOperand(Character operand) {
         output.append(operand);
     }
 
-    private void handleClosingParenthesis() {
+    private static void handleClosingParenthesis() {
         while (!stack.isEmpty() && stack.peek() != '(') {
             output.append(stack.pop());
             visualizer.print(input, stack, output.toString());
@@ -75,14 +75,14 @@ public final class ShuntingYard {
         stack.pop();
     }
 
-    private void handleOperator(Character operator) {
+    private static void handleOperator(Character operator) {
         while (!stack.isEmpty() && stack.peek() != '(' && hasHigherOrEqualPriority(stack.peek(), operator)) {
             output.append(stack.pop());
         }
         stack.push(operator);
     }
 
-    private boolean hasHigherOrEqualPriority(Character stackOp, Character inputOp) {
+    private static boolean hasHigherOrEqualPriority(Character stackOp, Character inputOp) {
         int stackPriority = Priorities.getStackPriority(stackOp);
         int inputPriority = Priorities.getInputPriority(inputOp);
 
@@ -92,7 +92,7 @@ public final class ShuntingYard {
         return stackPriority > inputPriority;
     }
 
-    private void resetState() {
+    private static void resetState() {
         input = "";
         stack.clear();
         output.setLength(0);

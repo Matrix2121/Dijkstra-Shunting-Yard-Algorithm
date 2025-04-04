@@ -5,7 +5,7 @@ import java.util.List;
 
 public class Visualizer {
     Integer inputLenght;
-    Integer step = 0;
+    Integer step;
 
     public void print(String input, Deque<Character> stack, String output){
         char[] inputArray = input.toCharArray();
